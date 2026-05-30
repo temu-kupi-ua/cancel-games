@@ -1,337 +1,399 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ABS Workout</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UKRAINE GTA - Форум | Гайд по збору пляшок</title>
+    <style>
+        /* Основні стилі у стилі форуму Ukraine GTA */
+        :root {
+            --bg-main: #0b0c10;
+            --bg-card: #15161c;
+            --bg-hover: #1f212a;
+            --text-color: #e2e8f0;
+            --text-muted: #8a8f9d;
+            --accent-orange: #ff5722;
+            --accent-blue: #00bcd4;
+            --border-color: #242631;
+        }
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
 
-body{
-background:#000;
-color:white;
-padding:20px;
-min-height:100vh;
-}
+        /* Шапка форуму */
+        header {
+            background-color: var(--bg-card);
+            border-bottom: 2px solid var(--border-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.container{
-max-width:400px;
-margin:auto;
-}
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-.streak-container{
-display:flex;
-flex-direction:column;
-align-items:center;
-margin-bottom:25px;
-}
+        .logo-text {
+            font-weight: 800;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, #ffeb3b, #ff5722);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-.fire{
-font-size:65px;
-animation:pulse 1.5s infinite;
-filter:drop-shadow(0 0 10px orange);
-transition:0.4s;
-}
+        .forum-nav {
+            display: flex;
+            gap: 20px;
+        }
 
-.fire.inactive{
-opacity:0.3;
-filter:none;
-}
+        .forum-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
 
-@keyframes pulse{
-0%{
-transform:scale(1);
-}
-50%{
-transform:scale(1.2);
-}
-100%{
-transform:scale(1);
-}
-}
+        .forum-nav a:hover, .forum-nav a.active {
+            color: var(--text-color);
+        }
 
-.streak-text{
-margin-top:10px;
-font-size:22px;
-font-weight:bold;
-}
+        /* Головний контейнер */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
 
-.card{
-background:linear-gradient(135deg,#005eff,#4ea1ff);
-padding:25px;
-border-radius:25px;
-margin-bottom:25px;
-box-shadow:0 0 30px rgba(0,100,255,.4);
-}
+        /* Хлібні крихти та кнопка дії */
+        .forum-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-.card h1{
-font-size:28px;
-}
+        .breadcrumbs {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
 
-.exercise{
-display:flex;
-align-items:center;
-background:#111;
-padding:15px;
-margin-bottom:15px;
-border-radius:18px;
-}
+        .breadcrumbs a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
 
-.icon{
-width:55px;
-height:55px;
-background:#222;
-border-radius:15px;
-display:flex;
-justify-content:center;
-align-items:center;
-margin-right:15px;
-font-size:26px;
-}
+        .btn-create {
+            background-color: var(--accent-orange);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
 
-.timer{
-text-align:center;
-font-size:60px;
-font-weight:bold;
-margin:30px 0;
-}
+        .btn-create:hover {
+            background-color: #e04716;
+            transform: translateY(-1px);
+        }
 
-button{
-width:100%;
-padding:18px;
-border:none;
-border-radius:50px;
-background:#ff7b00;
-color:white;
-font-size:30px;
-font-weight:bold;
-cursor:pointer;
-transition:0.3s;
-}
+        /* Головний пост (Тема) */
+        .forum-post {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
 
-button:hover{
-transform:scale(1.03);
-}
+        .post-header {
+            background-color: #1a1b24;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
 
-button:disabled{
-opacity:0.5;
-}
-</style>
+        .post-title {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            color: #fff;
+        }
+
+        .post-meta {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 15px;
+        }
+
+        .meta-author {
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+
+        /* Тіло поста */
+        .post-body {
+            padding: 25px;
+        }
+
+        .post-badge {
+            background: rgba(0, 188, 212, 0.1);
+            color: var(--accent-blue);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        blockquote {
+            background: #1c1e27;
+            border-left: 4px solid var(--accent-orange);
+            margin: 20px 0;
+            padding: 15px 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        blockquote strong {
+            color: var(--accent-orange);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Спеціальний розділ з картами */
+        .map-section {
+            margin-top: 30px;
+        }
+
+        .map-card {
+            background-color: #1c1e27;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media(min-width: 768px) {
+            .map-card {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        .map-info {
+            flex: 1;
+        }
+
+        .map-info h4 {
+            margin: 0 0 8px 0;
+            font-size: 18px;
+            color: var(--accent-blue);
+        }
+
+        .map-info p {
+            margin: 0 0 10px 0;
+            color: var(--text-color);
+            font-size: 15px;
+        }
+
+        .img-placeholder {
+            width: 100%;
+            max-width: 280px;
+            background: var(--bg-main);
+            border: 1px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+            box-sizing: border-box;
+        }
+
+        .img-placeholder span {
+            display: block;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Футер теми */
+        .post-footer {
+            background-color: #1a1b24;
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .post-reactions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reaction-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .reaction-btn:hover {
+            border-color: var(--accent-orange);
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-
-<div class="streak-container">
-<div id="fire" class="fire inactive">🔥</div>
-<div class="streak-text">
-<span id="days">0</span> Days Streak
-</div>
-</div>
-
-<div class="card">
-<h1>ABS WORKOUT</h1>
-</div>
-
-<div class="exercise">
-<div class="icon">🏃</div>
-<div>High Stepping</div>
-</div>
-
-<div class="exercise">
-<div class="icon">💪</div>
-<div>Abdominal Crunches</div>
-</div>
-
-<div class="exercise">
-<div class="icon">🦶</div>
-<div>Heel Touch</div>
-</div>
-
-<div class="exercise">
-<div class="icon">⛰️</div>
-<div>Mountain Climber</div>
-</div>
-
-<div class="timer" id="timer">
-01:00
-</div>
-
-<button id="goBtn">
-GO!
-</button>
-
-</div>
-
-<script>
-
-let totalSeconds=60;
-let timerRunning=false;
-
-const timer=document.getElementById("timer");
-const button=document.getElementById("goBtn");
-const fire=document.getElementById("fire");
-const daysText=document.getElementById("days");
-
-let streak=Number(localStorage.getItem("streak"))||0;
-let lastDate=localStorage.getItem("lastWorkout");
-
-checkMissedDay();
-updateUI();
-
-function getToday(){
-
-let d=new Date();
-return d.toISOString().split("T")[0];
-
-}
-
-function daysBetween(oldDate,newDate){
-
-let d1=new Date(oldDate);
-let d2=new Date(newDate);
-
-let diff=Math.floor(
-(d2-d1)/(1000*60*60*24)
-);
-
-return diff;
-
-}
-
-function checkMissedDay(){
-
-if(!lastDate)return;
-
-let today=getToday();
-
-let diff=daysBetween(lastDate,today);
-
-if(diff>1){
-
-streak=0;
-
-localStorage.setItem(
-"streak",
-0
-);
-
-}
-
-}
-
-function updateUI(){
-
-daysText.innerText=streak;
-
-if(streak>0){
-
-fire.classList.remove("inactive");
-
-}else{
-
-fire.classList.add("inactive");
-
-}
-
-}
-
-button.onclick=function(){
-
-if(timerRunning) return;
-
-timerRunning=true;
-button.disabled=true;
-
-let seconds=60;
-
-let interval=setInterval(()=>{
-
-seconds--;
-
-let mins=Math.floor(seconds/60);
-
-let sec=seconds%60;
-
-timer.innerText=
-String(mins).padStart(2,"0")
-+
-":"
-+
-String(sec).padStart(2,"0");
-
-if(seconds<=0){
-
-clearInterval(interval);
-
-completeWorkout();
-
-timer.innerText="01:00";
-
-timerRunning=false;
-button.disabled=false;
-
-}
-
-},1000);
-
-}
-
-function completeWorkout(){
-
-let today=getToday();
-
-if(lastDate){
-
-let diff=daysBetween(
-lastDate,
-today
-);
-
-if(diff===0){
-
-alert(
-"Сьогодні тренування вже зараховано 🔥"
-);
-
-return;
-}
-
-}
-
-streak++;
-
-lastDate=today;
-
-localStorage.setItem(
-"streak",
-streak
-);
-
-localStorage.setItem(
-"lastWorkout",
-today
-);
-
-fire.classList.remove(
-"inactive"
-);
-
-updateUI();
-
-alert(
-"Тренування завершено! +1 день 🔥"
-);
-
-}
-
-</script>
+    <!-- Шапка форуму -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-text">UKRAINE GTA</div>
+            <span style="color: var(--border-color)">|</span>
+            <span style="font-size: 14px; color: var(--text-muted);">Офіційний Форум</span>
+        </div>
+        <nav class="forum-nav">
+            <a href="#">Головна</a>
+            <a href="#" class="active">Форуми</a>
+            <a href="#">Нові дописи</a>
+            <a href="#">Користувачі</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+        <!-- Верхня панель дій -->
+        <div class="forum-actions">
+            <div class="breadcrumbs">
+                <a href="#">Головна</a> ➔ <a href="#">Ігрові сервери</a> ➔ <a href="#">Курилка</a>
+            </div>
+            <button class="btn-create">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+                Створити тему
+            </button>
+        </div>
+
+        <!-- Початок Теми Форуму -->
+        <article class="forum-post">
+            
+            <!-- Заголовок теми -->
+            <div class="post-header">
+                <h1 class="post-title">[Гайд] Мапа алкоголю: Де шукати всі пляшки для квесту?</h1>
+                <div class="post-meta">
+                    <span>Створено: <span class="meta-author">Львівський Батяр</span></span>
+                    <span>• Сьогодні о 17:12</span>
+                    <span>• Переглядів: 1.4K</span>
+                </div>
+            </div>
+
+            <!-- Контент теми -->
+            <div class="post-body">
+                <div class="post-badge">Ігровий Гайд</div>
+                
+                <p>Вітаю, шановні гравці! Щоб полегшити вам проходження щоденних квестів та івентів, пов'язаних із пошуком схованок, я зібрав до купи повну мапу розташування пляшок алкоголю по всіх секторах нашої карти. Користуйтеся!</p>
+
+                <blockquote>
+                    <strong>💡 Корисна порада від автора:</strong>
+                    Для збору точок найкраще брати маневрений та швидкий мотоцикл (наприклад, Ducati), оскільки більшість пляшок лежать у вузьких підворіттях та дворах, куди важко протиснутися на авто.
+                </blockquote>
+
+                <div class="map-section">
+                    <h3>🗺️ Розташування точок по секторах:</h3>
+
+                    <!-- Картка 1 -->
+                    <div class="map-card">
+                        <div class="map-info">
+                            <h4>1. Лівий берег Дніпра</h4>
+                            <p>Величезна концентрація пляшок у житлових кварталах. Шукайте біля під'їздів багатоповерхівок та за гаражами.</p>
+                            <span style="color: var(--text-muted); font-size: 13px;">Кількість точок: ~10 пляшок</span>
+                        </div>
+                        <div class="img-placeholder">
+                            <span>Мапа сектора</span>
+                            photo_2026-05-30_17-02-52_2.jpg
+                        </div>
+                    </div>
+
+                    <!-- Картка 2 -->
+                    <div class="map-card">
+                        <div class="map-info">
+                            <h4>2. Міський Аеропорт</h4>
+                            <p>Точки розкидані вздовж парканів злітної смуги, біля ангарів та на стоянках біля кругового розвороту.</p>
+                            <span style="color: var(--text-muted); font-size: 13px;">Кількість точок: ~10 пляшок</span>
+                        </div>
+                        <div class="img-placeholder">
+                            <span>Мапа сектора</span>
+                            photo_2026-05-30_17-02-51_2.jpg
+                        </div>
+                    </div>
+
+                    <!-- Картка 3 -->
+                    <div class="map-card">
+                        <div class="map-info">
+                            <h4>3. Стадіон та Паркова зона</h4>
+                            <p>Найлегший сектор: рівно 10 пляшок спавняться прямо по колу на бігових доріжках стадіону, інші — у сквері вище.</p>
+                            <span style="color: var(--text-muted); font-size: 13px;">Кількість точок: ~15 пляшок</span>
+                        </div>
+                        <div class="img-placeholder">
+                            <span>Мапа сектора</span>
+                            photo_2026-05-30_17-02-47_2.jpg
+                        </div>
+                    </div>
+
+                    <!-- Картка 4 -->
+                    <div class="map-card">
+                        <div class="map-info">
+                            <h4>4. ТРЦ / Залізничний Вокзал</h4>
+                            <p>Перевіряйте кожен двір праворуч від вокзальної площі та промислові склади неподалік залізничних колій.</p>
+                            <span style="color: var(--text-muted); font-size: 13px;">Кількість точок: ~14 пляшок</span>
+                        </div>
+                        <div class="img-placeholder">
+                            <span>Мапа сектора</span>
+                            photo_2026-05-30_17-02-48_2.jpg / _57_2.jpg
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Нижній бар поста (Вподобайки / Зворотній зв'язок) -->
+            <div class="post-footer">
+                <div>Знайшли нову точку? Пишіть у коментарях нижче!</div>
+                <div class="post-reactions">
+                    <button class="reaction-btn">👍 42</button>
+                    <button class="reaction-btn">❤️ 18</button>
+                </div>
+            </div>
+
+        </article>
+
+    </div>
 
 </body>
 </html>
