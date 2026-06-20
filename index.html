@@ -2,48 +2,223 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Подарунок Brawl Stars</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Лічильник Пресу (Оптимізований)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+    
     <style>
-        body { background: #1a1a2e; color: white; font-family: sans-serif; text-align: center; padding-top: 50px; }
-        .container { background: #16213e; padding: 20px; border-radius: 20px; display: inline-block; border: 2px solid #ffd700; }
-        .avatar { width: 100px; height: 100px; background: #e94560; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
-        button { background: #ffd700; border: none; padding: 15px 30px; font-size: 20px; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 20px; }
-        #result { margin-top: 20px; display: none; padding: 15px; background: #0f3460; border-radius: 10px; }
-        .disclaimer { font-size: 12px; color: #888; margin-top: 20px; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        h1 { color: #00ff88; margin-bottom: 10px; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 700px; }
+        .controls { margin-bottom: 20px; display: flex; gap: 10px; }
+        select, button { padding: 10px 20px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        select { background-color: #333; color: white; }
+        button { background-color: #00ff88; color: #121212; }
+        button:hover { background-color: #00cc6e; }
+        .stats { display: flex; gap: 40px; margin-bottom: 15px; font-size: 24px; }
+        .stat-box { text-align: center; }
+        .stat-value { font-size: 48px; font-weight: bold; color: #00ff88; }
+        .video-wrapper { position: relative; width: 640px; height: 480px; background: #222; border-radius: 10px; overflow: hidden; }
+        video, canvas { position: absolute; top: 0; left: 0; }
+        #status { margin-top: 10px; color: #ffcc00; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="avatar">🎁</div>
-    <h1>Вітаємо!</h1>
-    <p>Ви отримали подарунок: <b>200 гемів!</b></p>
-    <button onclick="showData()">Отримати подарунок</button>
+    <h1>AI Лічильник Пресу</h1>
+    
+    <div class="container">
+        <div class="controls">
+            <select id="timer-select">
+                <option value="no-limit">Без таймеру</option>
+                <option value="10">10 хвилин</option>
+                <option value="30">30 хвилин</option>
+                <option value="60">60 хвилин</option>
+            </select>
+            <button id="start-btn">Старт</button>
+            <button id="reset-btn">Скинути</button>
+        </div>
 
-    <div id="result">
-        <h3>Ваші технічні дані:</h3>
-        <p id="ip-display">IP-адреса: завантаження...</p>
-        <p>Ваш пристрій: <span id="ua-display"></span></p>
-        <p class="disclaimer">Це демонстраційний проєкт для перевірки IP.</p>
+        <div class="stats">
+            <div class="stat-box">
+                <div>Час</div>
+                <div id="timer-display" class="stat-value">00:00</div>
+            </div>
+            <div class="stat-box">
+                <div>Прес</div>
+                <div id="counter-display" class="stat-value">0</div>
+            </div>
+        </div>
+
+        <div id="status">Завантаження швидкої моделі AI...</div>
+
+        <div class="video-wrapper">
+            <video id="webcam" width="640" height="480" autoplay playsinline muted></video>
+            <canvas id="output" width="640" height="480"></canvas>
+        </div>
     </div>
-</div>
 
-<script>
-    function showData() {
-        document.getElementById('result').style.display = 'block';
-        document.getElementById('ua-display').innerText = navigator.userAgent;
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('output');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const timerSelect = document.getElementById('timer-select');
+        const timerDisplay = document.getElementById('timer-display');
+        const counterDisplay = document.getElementById('counter-display');
+        const statusText = document.getElementById('status');
 
-        // Отримання IP через безкоштовний API
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('ip-display').innerText = "IP-адреса: " + data.ip;
-            })
-            .catch(() => {
-                document.getElementById('ip-display').innerText = "Не вдалося отримати IP";
+        let detector;
+        let count = 0;
+        let isDown = true; 
+        let workoutActive = false;
+        let timerInterval;
+        let timeLeft = 0;
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480, frameRate: { ideal: 30 } },
+                audio: false
             });
-    }
-</script>
+            video.srcObject = stream;
+            return new Promise((resolve) => { video.onloadedmetadata = () => resolve(video); });
+        }
 
+        async function loadModel() {
+            // Вмикаємо прискорення WebGL
+            await tf.setBackend('webgl');
+            
+            const model = poseDetection.SupportedModels.BlazePose;
+            const detectorConfig = {
+                runtime: 'tfjs',
+                enableSmoothing: true,
+                modelType: 'lite' // ЗМІНЕНО З 'full' НА 'lite' ДЛЯ ПРИСКОРЕННЯ
+            };
+            detector = await poseDetection.createDetector(model, detectorConfig);
+            statusText.innerText = "Модель завантажено! Ляжте боком до камери.";
+        }
+
+        async function detectPose() {
+            if (!workoutActive) return;
+
+            // Зменшуємо частоту кадрів для ШІ, щоб не лагав інтерфейс
+            const poses = await detector.estimatePoses(video, {maxPoses: 1, flipHorizontal: false});
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (poses.length > 0) {
+                const keypoints = poses[0].keypoints;
+                drawKeypoints(keypoints);
+
+                const leftShoulder = keypoints.find(k => k.name === 'left_shoulder');
+                const leftHip = keypoints.find(k => k.name === 'left_hip');
+                const rightShoulder = keypoints.find(k => k.name === 'right_shoulder');
+                const rightHip = keypoints.find(k => k.name === 'right_hip');
+
+                let shoulder = leftShoulder?.score > rightShoulder?.score ? leftShoulder : rightShoulder;
+                let hip = leftHip?.score > rightHip?.score ? leftHip : rightHip;
+
+                if (shoulder && hip && shoulder.score > 0.5 && hip.score > 0.5) {
+                    const yDiff = hip.y - shoulder.y;
+
+                    // Якщо ти ліг боком, ці пороги чітко спрацюють
+                    if (isDown && yDiff > 100) { 
+                        isDown = false; // Тіло піднялося
+                    } else if (!isDown && yDiff < 40) {
+                        count++;
+                        counterDisplay.innerText = count;
+                        isDown = true; // Тіло лягло назад
+                    }
+                }
+            }
+
+            // Запускаємо наступний кадр через невелику паузу, щоб розвантажити процесор
+            setTimeout(() => {
+                if (workoutActive) requestAnimationFrame(detectPose);
+            }, 1000 / 24); // Обмеження до 24 кадрів/сек для плавності
+        }
+
+        function drawKeypoints(keypoints) {
+            keypoints.forEach(keypoint => {
+                if (keypoint.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = '#00ff88';
+                    ctx.fill();
+                }
+            });
+        }
+
+        function startTimer() {
+            let mode = timerSelect.value;
+            if (mode === 'no-limit') {
+                let seconds = 0;
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                    let s = (seconds % 60).toString().padStart(2, '0');
+                    timerDisplay.innerText = `${m}:${s}`;
+                }, 1000);
+            } else {
+                timeLeft = parseInt(mode) * 60;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                    let s = (timeLeft % 60).toString().padStart(2, '0');
+                    timerDisplay.innerText = `${m}:${s}`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        workoutActive = false;
+                        statusText.innerText = `Час вийшов! Результат: ${count}`;
+                    }
+                }, 1000);
+            }
+        }
+
+        startBtn.addEventListener('click', () => {
+            if (!workoutActive) {
+                workoutActive = true;
+                startBtn.innerText = "Пауза";
+                statusText.innerText = "Рахую вправи...";
+                startTimer();
+                detectPose();
+            } else {
+                workoutActive = false;
+                startBtn.innerText = "Старт";
+                clearInterval(timerInterval);
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            workoutActive = false;
+            clearInterval(timerInterval);
+            count = 0;
+            counterDisplay.innerText = count;
+            timerDisplay.innerText = "00:00";
+            startBtn.innerText = "Старт";
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        async function init() {
+            await setupCamera();
+            video.play();
+            await loadModel();
+        }
+
+        init();
+    </script>
 </body>
 </html>
